@@ -234,9 +234,4 @@ The clusters are **not wine-quality grades**. They represent groups formed from 
 - The ETL pipeline standardizes column names, so training and prediction inputs must use consistent feature names.
 - Scaling and PCA are part of the saved scikit-learn pipeline. Do not independently fit new scalers or PCA transformations when predicting with the saved model.
 - A successful run and balanced-looking cluster sizes do not by themselves prove that a clustering model is useful. Evaluate cluster separation, stability, and interpretability.
-- The repository should not contain secrets, virtual environments, or unnecessary generated files. Check the dataset, notebook, and model file sizes before pushing to GitHub.
-"""
-path = Path("/mnt/data/README.md")
-path.write_text(content, encoding="utf-8")
-print(f"Created {path}")
 
