@@ -49,8 +49,6 @@ The white wine dataset contains **4,898 rows and 12 columns**: 11 physicochemica
 
 Dataset source: [UCI Machine Learning Repository — Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality)
 
-Please review the dataset's original description and terms before redistributing the data.
-
 ## Current Workflow
 
 ### 1. ETL
@@ -67,8 +65,6 @@ The current white wine output is saved as:
 ```text
 processed/white_wine_processed.csv
 ```
-
-The output preserves the `quality` column for later analysis. The model-training code should explicitly exclude it from the clustering features.
 
 ### 2. Clustering
 
@@ -115,8 +111,6 @@ wine_quality_project/
 ├── .gitignore
 └── README.md
 ```
-
-If your orchestration file is named `main.py` rather than `run_etl.py`, use that actual filename in the commands below.
 
 ## Tech Stack
 
