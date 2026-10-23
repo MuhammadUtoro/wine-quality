@@ -1,5 +1,6 @@
 ## We test the train module
 import pandas as pd
+import joblib
 from pathlib import Path
 from train import load_data,prepare_features,build_pipeline,train_model,save_model
 from sklearn.utils.validation import check_is_fitted
@@ -60,3 +61,16 @@ def test_save_model(tmp_path):
   save_model(model, model_path)
 
   assert model_path.exists()
+
+## Test save model
+def test_load_model(tmp_path):
+  model_path = tmp_path/"wine_clustering.joblib"
+  DATA_PATH = Path("data/winequality-white.csv")
+  df = load_data(DATA_PATH)
+  X = df.drop(columns=["quality"])
+
+  model = train_model(X)
+  save_model(model, model_path)
+  assert model_path.exists()
+  loaded_model = joblib.load(model_path)
+  assert len(loaded_model.predict(X)) == len(X)
