@@ -1,6 +1,15 @@
 ## We test the train module
 import pandas as pd
-from train import prepare_features
+from pathlib import Path
+from train import load_data,prepare_features,build_pipeline,train_model,save_model
+from sklearn.utils.validation import check_is_fitted
+
+## Test the load_data()
+def test_load_data():
+  DATA_PATH = Path("data/winequality-white.csv")
+  df = load_data(DATA_PATH)
+
+  assert df.shape == (4898, 12)
 
 ## Test the prepare_features() method
 def test_prepare_features():
@@ -19,3 +28,35 @@ def test_prepare_features():
   assert "fixed_acidity" in X.columns
   assert "alcohol" in X.columns
   assert X.shape == (2,2)
+
+## Test the pipeline build
+def test_build_pipline():
+  pipeline = build_pipeline()
+
+  assert list(pipeline.named_steps.keys()) == [
+    "scaler", "pca", "kmeans"
+  ]
+
+  assert pipeline.named_steps["pca"].n_components == 5
+  assert pipeline.named_steps["kmeans"].random_state == 42
+
+## Test the train
+def test_train_model():
+  DATA_PATH = Path("data/winequality-white.csv")
+  df = load_data(DATA_PATH)
+  X = df.drop(columns=["quality"])
+  model = train_model(X)
+
+  check_is_fitted(model)
+  assert len(model.predict(X)) == len(X)
+
+## Test the save model
+def test_save_model(tmp_path):
+  model_path = tmp_path/"wine_clustering.joblib"
+  DATA_PATH = Path("data/winequality-white.csv")
+  df = load_data(DATA_PATH)
+  X = df.drop(columns=["quality"])
+  model = train_model(X)
+  save_model(model, model_path)
+
+  assert model_path.exists()
