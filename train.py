@@ -1,6 +1,8 @@
 ## Import libraries or package
 import pandas as pd
 import joblib
+import mlflow
+import mlflow.sklearn
 from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -59,18 +61,34 @@ def save_model(pipeline, filepath=MODEL_PATH):
 
 ## Run the training process
 def main():
-  df = load_data()
-  print(f"Dataset shape: {df.shape}")
-  print(f"Stats overview: {df.describe()}")
+  from sklearn.metrics import silhouette_score
+  mlflow.set_tracking_uri("http://127.0.0.1:5000")
+  mlflow.set_experiment("wine-clustering")
+  print("Tracking URI:", mlflow.get_tracking_uri())
+  with mlflow.start_run(run_name="kmeans-baseline-2"):
+    df = load_data()
+    print(f"Dataset shape: {df.shape}")
+    print(f"Stats overview: {df.describe()}")
 
-  X = prepare_features(df)
-  print(f"Fetures for training: {X.columns.tolist()}")
+    X = prepare_features(df)
+    print(f"Features for training: {X.columns.tolist()}")
 
-  pipeline = train_model(X)
-  labels = pipeline.predict(X)
-  print(f"Cluster size:\n{pd.Series(labels).value_counts().sort_index()}")
+    mlflow.log_param("n_clusters", 2)
+    mlflow.log_param("random_state", 42)
+    mlflow.log_param("n_init", 10)
+    pipeline = train_model(X)
+    labels = pipeline.predict(X)
+    X_transformed = pipeline[:-1].transform(X)
+    silhouette = silhouette_score(X_transformed, labels)
+    inertia = pipeline.named_steps["kmeans"].inertia_
+    explained_variance = pipeline.named_steps["pca"].explained_variance_ratio_.sum()
+    mlflow.log_metric("inertia", inertia)
+    mlflow.log_metric("pca_explained_variance", explained_variance)
+    mlflow.log_metric("silhouette score", silhouette)
+    labels = pipeline.predict(X)
+    print(f"Cluster size:\n{pd.Series(labels).value_counts().sort_index()}")
 
-  save_model(pipeline)
+    save_model(pipeline)
 
 ## Run
 if __name__ == "__main__":
