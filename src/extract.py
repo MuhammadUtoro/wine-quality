@@ -6,7 +6,7 @@ def extract_csv(filepath, filename, separator=";"):
   file = os.path.join(filepath, filename)
 
   if not os.path.isfile(file):
-    raise FileNotFoundError(f"cannot locat file at: {file}")
+    raise FileNotFoundError(f"cannot locate file at: {file}")
 
   df = pd.read_csv(file, sep=separator)
   print(f"File loaded successfully!: {file}")
